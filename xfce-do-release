@@ -1,0 +1,118 @@
+#!/bin/bash
+
+component=$1
+version=$2
+steps=1
+steps_complete=0
+
+# Check if the input parameters (component version) were provided
+test_parameters () {
+	if [ -n "$1" ]; then
+		echo "Component: $component"
+	else
+		currentdir=${PWD##*/}
+		read -p "Specify a component (Default: '$currentdir') " new_component
+		if [ "$new_component" = "" ]; then
+			component="$(echo "$currentdir")"
+			echo "Component: $component"
+		else
+			component="$(echo "$new_component")"
+			echo "Component: $component"
+		fi
+	fi
+
+	if [ -n "$2" ]; then
+		echo "Version: $version"
+	else
+		read -p "Specify a version: " version
+		if [ "$version" = "" ]; then
+			printf "\nError: Please specify a version"
+			exit 1
+		else
+			echo "Version: $version"
+		fi
+	fi
+}
+
+# Print the step info
+step () {
+	printf "\n\n ==================\n Step $steps: $1\n ==================\n"
+}
+
+# Just pause for user confirmation
+get_on_with_it () {
+	read -n 1 -p " → Done?"
+	let steps++
+	let steps_complete++
+}
+
+# Ask whether the step should be executed
+run_command () {
+	let steps++
+	read -n 1 -p " → Do it? (yes/skip/abort)" response
+	printf "\n"
+	if [ "$response" = "y" ]; then
+		$1 && $2 && $3
+		printf "\n ✓ Done."
+		let steps_complete++
+	elif [ "$response" = "s" ]; then
+		printf "\n Step $steps skipped."
+		return
+	else
+		read -n 1 -p " Step $(( $steps - 1 )) aborted. Do you really want to quit? (y/n)" abort
+		if [ "$abort" = "y" ]; then
+			printf "\n Aborted. (Steps complete: $steps_complete)\n"
+        		exit 0
+		else
+			printf "\n Step $steps aborted. Continuing...\n"
+			return
+		fi
+	fi
+}
+
+# Playbook for all release steps
+run_steps () {
+	step "Update README/NEWS, update configure.ac.in with new version and remove git tag"
+	get_on_with_it
+
+	step "Build the tarball: ./autogen.sh && make distcheck"
+	run_command "./autogen.sh" "make distcheck"
+
+	step "Commit the changes, git add -u; git commit -m 'Updates for release'"
+	run_command "git add -u" "git commit -m 'Updates for release'"
+
+	step "Tag the version: git tag -a $component-$version"
+	run_command "git tag -a $component-$version"
+
+	step "Push your changes: git push && git push --tags"
+	run_command "git push" "git push --tags"
+
+	step "Run sha1sum $component-$version.tar.bz2"
+	run_command "sha1sum $component-$version.tar.bz2"
+
+	step "Open https://releases.xfce.org/ log in with your Xfce HTTPS credentials"
+	get_on_with_it
+
+	step "Click on Release New Version: https://releases.xfce.org/project/$component/new-release"
+	get_on_with_it
+
+	step "Add the git back to version_tag() in configure.ac.in"
+	get_on_with_it
+
+	step "Commit and push the change"
+	run_command "git add -u" "git commit -m 'Back to development'" "git push"
+
+	step "Add the version to the bugzilla component: https://bugzilla.xfce.org/editversions.cgi?action=add&product=$component"
+	get_on_with_it
+}
+
+### Main loop
+
+main () {
+	test_parameters $component $version
+	run_steps
+
+	printf "\nCongrats, you completed $steps_complete of $steps steps of doing a release for Xfce!\n"
+}
+
+main
