@@ -40,7 +40,7 @@ test_parameters () {
 
 # Print the step info
 step () {
-	printf "\n\n ==================\n Step $steps: $1\n ==================\n"
+	printf "\n\n \e[1mStep $steps: $1\e[0m\n ==================\n"
 }
 
 # Just pause for user confirmation
@@ -76,25 +76,25 @@ run_command () {
 
 # Playbook for all release steps
 run_steps () {
-	step "Update README/NEWS, update configure.ac.in with new version and remove git tag"
+	step "Update README/NEWS and configure.ac.in \e[0m(add new version and remove git tag)"
 	get_on_with_it
 
-	step "Build the tarball: ./autogen.sh && make distcheck"
+	step "Build the tarball \e[0m(./autogen.sh && make distcheck)"
 	run_command "./autogen.sh" "make distcheck"
 
-	step "Commit the changes, git add -u; git commit -m 'Updates for release'"
+	step "Commit the changes \e[0m(git add -u; git commit -m 'Updates for release')"
 	run_command "git add -u" "git commit -m 'Updates for release'"
 
-	step "Tag the version: git tag -a $component-$version"
+	step "Tag the version \e[0m(git tag -a $component-$version)"
 	run_command "git tag -a $component-$version"
 
-	step "Push your changes: git push && git push --tags"
+	step "Push your changes \e[0m(git push && git push --tags)"
 	run_command "git push" "git push --tags"
 
 	step "Run sha1sum $component-$version.tar.bz2"
 	run_command "sha1sum $component-$version.tar.bz2"
 
-	step "Open https://releases.xfce.org/ log in with your Xfce HTTPS credentials"
+	step "Open https://releases.xfce.org/ and log in"
 	get_on_with_it
 
 	step "Click on Release New Version: https://releases.xfce.org/project/$component/new-release"
@@ -103,7 +103,7 @@ run_steps () {
 	step "Add the git back to version_tag() in configure.ac.in"
 	get_on_with_it
 
-	step "Commit and push the change"
+	step "Commit and push the change \e[0m(git add -u; git commit -m 'Back to development'; git push)"
 	run_command "git add -u" "git commit -m 'Back to development'" "git push"
 
 	step "Add the version to the bugzilla component: https://bugzilla.xfce.org/editversions.cgi?action=add&product=$component"
