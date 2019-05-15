@@ -29,7 +29,11 @@ test_parameters () {
 			printf "\nError: Please specify a version"
 			exit 1
 		else
-			echo "Version: $version"
+			if [ "$(git tag | grep -c $version\$)" = "1" ]; then
+				echo "Git tag match: $(git tag | grep $version\$)"
+			else
+				read -n 1 -p "Warning: The version you specified ('$version') does not exist as a git tag. Press any key to continue"
+			fi
 		fi
 	fi
 }
