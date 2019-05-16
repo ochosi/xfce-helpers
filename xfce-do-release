@@ -50,6 +50,15 @@ get_on_with_it () {
 	let steps_complete++
 }
 
+# Print updated languages since the most recent annotated tag
+print_updated_languages () {
+	if [ -x "$(command -v xfce-language-updates)" ]; then
+		tag=$(git describe --abbrev=0)
+		echo "Updated languages since $tag: "
+		xfce-language-updates $tag | fold -w 80 -s
+	fi
+}
+
 # Ask whether the step should be executed
 run_command () {
 	let steps++
@@ -77,6 +86,7 @@ run_command () {
 # Playbook for all release steps
 run_steps () {
 	step "Update README/NEWS and configure.ac.in \e[0m(add new version and remove git tag)"
+	print_updated_languages
 	get_on_with_it
 
 	step "Build the tarball \e[0m(./autogen.sh && make distcheck)"
