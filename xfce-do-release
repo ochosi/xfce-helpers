@@ -24,7 +24,7 @@ test_parameters () {
 	if [ -n "$2" ]; then
 		echo "Version: $version"
 	else
-		read -p "Specify a version: " version
+		read -p "Specify a version (e.g. 4.14.0 or 4.13.3): " version
 		if [ "$version" = "" ]; then
 			printf "\nError: Please specify a version"
 			exit 1
