@@ -104,11 +104,11 @@ run_steps () {
 	step "Run sha1sum $component-$version.tar.bz2"
 	run_command "sha1sum $component-$version.tar.bz2"
 
-	step "Open https://releases.xfce.org/ and log in"
-	get_on_with_it
+	step "Log in to the release manager \e[0m(https://releases.xfce.org/)"
+	run_command "exo-open 'https://releases.xfce.org/'"
 
-	step "Click on Release New Version: https://releases.xfce.org/project/$component/new-release"
-	get_on_with_it
+	step "Click on 'Release New Version' \e[0m(https://releases.xfce.org/project/$component/new-release)"
+	run_command "exo-open 'https://releases.xfce.org/project/$component/new-release'"
 
 	step "Add the git back to version_tag() in configure.ac.in"
 	get_on_with_it
@@ -116,8 +116,8 @@ run_steps () {
 	step "Commit and push the change \e[0m(git add -u; git commit -m 'Back to development'; git push)"
 	run_command "git add -u" "git commit -m 'Back to development'" "git push"
 
-	step "Add the version to the bugzilla component: https://bugzilla.xfce.org/editversions.cgi?action=add&product=$component"
-	get_on_with_it
+	step "Add the version to the bugzilla component \e[0m(https://bugzilla.xfce.org/editversions.cgi?action=add&product=$component)"
+	run_command "exo-open 'https://bugzilla.xfce.org/editversions.cgi?action=add&product=$component'"
 }
 
 ### Main loop
