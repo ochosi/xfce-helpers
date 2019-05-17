@@ -69,7 +69,7 @@ run_command () {
 		printf "\n ✓ Done."
 		let steps_complete++
 	elif [ "$response" = "s" ]; then
-		printf "\n Step $steps skipped."
+		printf "\n Step $(( $steps - 1 )) skipped."
 		return
 	else
 		read -n 1 -p " Step $(( $steps - 1 )) aborted. Do you really want to quit? (y/n)" abort
@@ -77,7 +77,7 @@ run_command () {
 			printf "\n Aborted. (Steps complete: $steps_complete)\n"
         		exit 0
 		else
-			printf "\n Step $steps aborted. Continuing...\n"
+			printf "\n Step $(( $steps - 1 )) aborted. Continuing...\n"
 			return
 		fi
 	fi
