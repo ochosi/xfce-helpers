@@ -30,9 +30,7 @@ test_parameters () {
 			exit 1
 		else
 			if [ "$(git tag | grep -c $version\$)" = "1" ]; then
-				echo "Git tag match: $(git tag | grep $version\$)"
-			else
-				read -n 1 -p "Warning: The version you specified ('$version') does not exist as a git tag. Press any key to continue"
+				read -n 1 -p "Warning: The version you specified ('$version') exists as a git tag. Do you really want to release again?"
 			fi
 		fi
 	fi
