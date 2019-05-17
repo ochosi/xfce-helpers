@@ -5,4 +5,4 @@ LAST_TAG=$(git describe  --abbrev=0)
 
 echo "Here are the changes since the tag $LAST_TAG"
 
-git log --format=%s ${LAST_TAG}..HEAD|grep -v "Update translation"|while read line; do echo " - $line"| fold -s -w $LINE_LENGTH - |sed -e "s/^[^ ]/   &/g";done
+git log --format=%s ${LAST_TAG}..HEAD|grep -v "Update translation"| grep -v "Add new translation" |while read line; do echo " - $line"| fold -s -w $LINE_LENGTH - |sed -e "s/^[^ ]/   &/g";done
