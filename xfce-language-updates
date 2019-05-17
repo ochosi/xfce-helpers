@@ -62,10 +62,29 @@ zh_HK,Chinese (Hong Kong)
 zh_TW,Chinese (Taiwan)
 "
 
-STARTTAG="$1"
+LAST_TAG=$(git describe  --abbrev=0)
+
+STARTTAG="${1:-$LAST_TAG}"
 ENDTAG="${2:-HEAD^}"
 
+LINE_LENGTH=72
+INDENT="   "
+
 UPDATES=$(git log --pretty=format:'%s' "$STARTTAG".."$ENDTAG" -- po/*.po | awk '{print $4}' | sort -u)
+
+if [ "${ENDTAG}" == "HEAD^" ]; then
+	ENDTAG_PRETTY="now"
+else
+	ENDTAG_PRETTY=${ENDTAG}
+fi
+NUM_LANGS=$(echo ${UPDATES}|wc -w)
+echo -n "From ${STARTTAG} until ${ENDTAG_PRETTY} ${NUM_LANGS} language"
+if [ $NUM_LANGS -ne 1 ]; then
+	echo -n "s have "
+else
+	echo -n " has "
+fi
+echo "been updated:"
 
 LANGUAGES=$(
 for l in $UPDATES; do
@@ -76,5 +95,5 @@ done
 SORTED=$(echo "$LANGUAGES" | sort)
 while read line; do
     echo -n "$line, "
-done <<< "$SORTED"
+done <<< "$SORTED" | fold -s -w $LINE_LENGTH - |sed -e "s/^[^ ]/${INDENT}&/g"
 echo ""
