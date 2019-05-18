@@ -72,6 +72,18 @@ run_command () {
 	fi
 }
 
+# If xclip is available we copy the hash to the user's clipboard (for the release manager)
+get_sha1_hash () {
+	SHA1=$(sha1sum $component-$version.tar.bz2 | cut -d ' ' -f 1)
+	if [ -x "$(command -v xclip)" ]; then
+		echo $SHA1 | xclip -selection c
+		echo $SHA1
+	else
+		printf "Could not copy the hash to the clipboard, please install xclip for this step. Here's the hash:\n$SHA1\n\n"
+		get_on_with_it
+	fi
+}
+
 # Playbook for all release steps
 run_steps () {
 	step "Update configure.ac.in \e[0m(add new version and remove git tag)"
@@ -95,8 +107,8 @@ run_steps () {
 	step "Push your changes \e[0m(git push && git push --tags)"
 	run_command "git push" "git push --tags"
 
-	step "Run sha1sum $component-$version.tar.bz2"
-	run_command "sha1sum $component-$version.tar.bz2"
+	step "Run sha1sum $component-$version.tar.bz2 and copy hash to clipboard"
+	get_sha1_hash
 
 	step "Log in to the release manager \e[0m(https://releases.xfce.org/)"
 	run_command "exo-open 'https://releases.xfce.org/'"
