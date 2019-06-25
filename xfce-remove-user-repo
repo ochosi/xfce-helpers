@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if [ -n "$1" ]; then
+    repo=$1
+else
+    repo=${PWD##*/}
+
+user=$(whoami)
+
+echo "Unlocking $repo for user $user"
+ssh git@git.xfce.org D unlock users/$user/$repo
+echo "Deleting the repository $repo"
+ssh git@git.xfce.org D rm users/$user/$repo
