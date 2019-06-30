@@ -51,7 +51,7 @@ get_on_with_it () {
 # Ask whether the step should be executed
 run_command () {
 	let steps++
-	read -n 1 -p " → Do it? (yes/skip/abort)" response
+	read -n 1 -p " → Do it? ([y]es, [n]o, [s]kip)" response
 	printf "\n"
 	if [ "$response" = "y" ]; then
 		eval $1 && eval $2 && eval $3
@@ -61,7 +61,7 @@ run_command () {
 		printf "\n Step $(( $steps - 1 )) skipped."
 		return
 	else
-		read -n 1 -p " Step $(( $steps - 1 )) aborted. Do you really want to quit? (y/n)" abort
+		read -n 1 -p " Step $(( $steps - 1 )) aborted. Do you really want to quit? ([y]es, [n]o)" abort
 		if [ "$abort" = "y" ]; then
 			printf "\n Aborted. (Steps complete: $steps_complete)\n"
         		exit 0
