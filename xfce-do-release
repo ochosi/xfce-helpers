@@ -77,6 +77,16 @@ run_command () {
 	fi
 }
 
+update_configure_ac_in () {
+	if [ -f "configure.ac.in" ]; then
+		sed -i 's/\(m4_define(\[.*_version_tag\],\[\)\(.*\)\(\])\)/\1\3/g' configure.ac.in
+		git diff configure.ac.in
+		get_on_with_it
+	else
+		echo "There is no 'configure.ac.in' file."
+	fi
+}
+
 # If xclip is available we copy the hash to the user's clipboard (for the release manager)
 get_sha1_hash () {
 	SHA1=$(sha1sum $component-$version.tar.bz2 | cut -d ' ' -f 1)
@@ -92,7 +102,7 @@ get_sha1_hash () {
 # Playbook for all release steps
 run_steps () {
 	step "Update configure.ac.in \e[0m(add new version and remove git tag)"
-	get_on_with_it
+	run_command update_configure_ac_in
 
 	step "Update NEWS file with changelog? \e[0m(xfce-update-news)"
 	run_command "xfce-update-news $component $version"
