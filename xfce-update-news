@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+COMPONENT=$1
+VERSION=$2
+LAST_TAG=$(git describe  --abbrev=0)
+RELEASE_NOTES="/tmp/release_notes"
+TRANSLATIONS="/tmp/translations"
+
+# Push the release notes and translations text to tmp files
+xfce-get-release-notes news > $RELEASE_NOTES
+xfce-get-translations "$COMPONENT-$VERSION" $LAST_TAG silent > $TRANSLATIONS
+
+cleanup () {
+    rm $RELEASE_NOTES
+    rm $TRANSLATIONS
+}
+
+# Check if there is a NEWS file
+if [ ! -f "NEWS" ]; then
+    echo "There is no 'NEWS' file. Changelog since $VERSION:"
+    printf '%s\n======\n%s\n%s\n\n%s' $VERSION "$(cat $RELEASE_NOTES)" "$(cat $TRANSLATIONS)"
+    cleanup
+else
+    printf '%s\n======\n%s\n%s\n\n%s' $VERSION "$(cat $RELEASE_NOTES)" "$(cat $TRANSLATIONS)" "$(cat NEWS)" > NEWS
+    cleanup
+    git diff NEWS
+fi

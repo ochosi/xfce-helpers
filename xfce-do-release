@@ -32,12 +32,11 @@ test_parameters () {
 			version="$(echo "$last_version.$new_tag")"
 			echo "Version: $version"
 		else
-			if [ "$(git tag | grep -c $version\$)" = "1" ]; then
-				read -n 1 -p "Warning: The version you specified ('$version') exists as a git tag. Do you really want to release again?"
-			else
-				version="$(echo "$new_version")"
-				echo "Version: $version"
+			if [ "$(git tag | grep -c $new_version\$)" = "1" ]; then
+				read -n 1 -p "Warning: The version you specified ('$new_version') exists as a git tag. Do you really want to release again?"
 			fi
+			version="$(echo "$new_version")"
+			echo "Version: $version"
 		fi
 	fi
 }
