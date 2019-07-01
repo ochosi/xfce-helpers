@@ -66,6 +66,7 @@ LAST_TAG=$(git describe  --abbrev=0)
 
 STARTTAG="${1:-$LAST_TAG}"
 ENDTAG="${2:-HEAD^}"
+SILENT="${3:-}"
 
 LINE_LENGTH=72
 INDENT="   "
@@ -78,13 +79,8 @@ else
 	ENDTAG_PRETTY=${ENDTAG}
 fi
 NUM_LANGS=$(echo ${UPDATES}|wc -w)
-echo -n "From ${STARTTAG} until ${ENDTAG_PRETTY} ${NUM_LANGS} language"
-if [ $NUM_LANGS -ne 1 ]; then
-	echo -n "s have "
-else
-	echo -n " has "
-fi
-echo "been updated:"
+
+printf '%s\n' ' - Translation Updates:'
 
 LANGUAGES=$(
 for l in $UPDATES; do
@@ -97,3 +93,13 @@ while read line; do
     echo -n "$line, "
 done <<< "$SORTED" | fold -s -w $LINE_LENGTH - |sed -e "s/^[^ ]/${INDENT}&/g"
 echo ""
+
+if [ "$SILENT" != "silent" ]; then
+	echo -n "From ${STARTTAG} until ${ENDTAG_PRETTY} ${NUM_LANGS} language"
+	if [ $NUM_LANGS -ne 1 ]; then
+		echo -n "s have "
+	else
+		echo -n " has "
+	fi
+	echo "been updated."
+fi

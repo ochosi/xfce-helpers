@@ -95,11 +95,8 @@ run_steps () {
 	step "Update configure.ac.in \e[0m(add new version and remove git tag)"
 	get_on_with_it
 
-	step "Add changelog to README/NEWS. Show changes since last tag? \e[0m(xfce-get-release-notes)"
-	run_command "xfce-get-release-notes"
-
-	step "Add translation updates to README/NEWS. Show changes since last tag? \e[0m(xfce-get-translations)"
-	run_command "xfce-get-translations"
+	step "Update NEWS file with changelog? \e[0m(xfce-update-news)"
+	run_command "xfce-update-news $component $version"
 
 	step "Build the tarball \e[0m(./autogen.sh && make distcheck)"
 	run_command "./autogen.sh" "make distcheck"
