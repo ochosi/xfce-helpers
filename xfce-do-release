@@ -4,9 +4,21 @@ component=$1
 version=$2
 steps=1
 steps_complete=0
-last_tag=$(git describe  --abbrev=0 | sed 's/\(.*\)-\(.*\)\.\(.*\)/\3/')
-last_version=$(git describe  --abbrev=0 | sed 's/\(.*\)-\(.*\)\.\(.*\)/\2/')
-new_tag=$(echo "$(($last_tag + 1))")
+
+# Ignore platform releases in the tag version list
+latest_tag=$(git describe  --abbrev=0)
+while [ $(echo $latest_tag | grep -c xfce-4) > 0 ]
+do
+	latest_tag=$(git describe  --abbrev=0 $latest_tag^)
+	if [ $(echo $latest_tag | grep -c xfce-4) = 0 ]; then
+		break
+	fi
+done
+
+latest_major=$(echo $latest_tag | sed 's/\(.*\)-\(.*\)\.\(.*\)\.\(.*\)/\2/')
+latest_minor=$(echo $latest_tag | sed 's/\(.*\)-\(.*\)\.\(.*\)\.\(.*\)/\3/')
+latest_patch=$(echo $latest_tag | sed 's/\(.*\)-\(.*\)\.\(.*\)/\3/')
+new_patch=$(echo "$(($latest_patch + 1))")
 
 # Check if the input parameters (component version) were provided
 test_parameters () {
@@ -27,9 +39,9 @@ test_parameters () {
 	if [ -n "$2" ]; then
 		echo "Version: $version"
 	else
-		read -p "Specify a version (Default: $last_version.$new_tag): " new_version
+		read -p "Specify a version (Default: $latest_major.$latest_minor.$new_patch): " new_version
 		if [ "$new_version" = "" ]; then
-			version="$(echo "$last_version.$new_tag")"
+			version="$(echo "$latest_major.$latest_minor.$new_patch")"
 			echo "Version: $version"
 		else
 			if [ "$(git tag | grep -c $new_version\$)" = "1" ]; then
@@ -39,6 +51,10 @@ test_parameters () {
 			echo "Version: $version"
 		fi
 	fi
+	semantic_version=( ${version//./ } )
+	version_major="${semantic_version[0]}"
+	version_minor="${semantic_version[1]}"
+	version_patch="${semantic_version[2]}"
 }
 
 # Print the step info
@@ -80,6 +96,9 @@ run_command () {
 update_configure_ac_in () {
 	if [ -f "configure.ac.in" ]; then
 		if [ "$1" = "pre" ]; then
+			sed -i "s/\(m4_define(\[.*_version_major\].* \[\)\(.*\)\(\])\)/\1$version_major\3/g" configure.ac.in
+			sed -i "s/\(m4_define(\[.*_version_minor\].* \[\)\(.*\)\(\])\)/\1$version_minor\3/g" configure.ac.in
+			sed -i "s/\(m4_define(\[.*_version_micro\].* \[\)\(.*\)\(\])\)/\1$version_patch\3/g" configure.ac.in
 			sed -i 's/\(m4_define(\[.*_version_tag\],\[\)\(.*\)\(\])\)/\1\3/g' configure.ac.in
 		elif [ "$1" = "post" ]; then
 			sed -i 's/\(m4_define(\[.*_version_tag\],\[\)\(.*\)\(\])\)/\1git\3/g' configure.ac.in
