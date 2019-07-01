@@ -4,6 +4,9 @@ component=$1
 version=$2
 steps=1
 steps_complete=0
+last_tag=$(git describe  --abbrev=0 | sed 's/\(.*\)-\(.*\)\.\(.*\)/\3/')
+last_version=$(git describe  --abbrev=0 | sed 's/\(.*\)-\(.*\)\.\(.*\)/\2/')
+new_tag=$(echo "$(($last_tag + 1))")
 
 # Check if the input parameters (component version) were provided
 test_parameters () {
@@ -24,13 +27,16 @@ test_parameters () {
 	if [ -n "$2" ]; then
 		echo "Version: $version"
 	else
-		read -p "Specify a version (e.g. 4.14.0 or 4.13.3): " version
-		if [ "$version" = "" ]; then
-			printf "\nError: Please specify a version"
-			exit 1
+		read -p "Specify a version (Default: $last_version.$new_tag): " new_version
+		if [ "$new_version" = "" ]; then
+			version="$(echo "$last_version.$new_tag")"
+			echo "Version: $version"
 		else
 			if [ "$(git tag | grep -c $version\$)" = "1" ]; then
 				read -n 1 -p "Warning: The version you specified ('$version') exists as a git tag. Do you really want to release again?"
+			else
+				version="$(echo "$new_version")"
+				echo "Version: $version"
 			fi
 		fi
 	fi
