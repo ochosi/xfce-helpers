@@ -4,24 +4,11 @@ component=$1
 version=$2
 steps=1
 steps_complete=0
-
-# Ignore platform releases in the tag version list
-latest_tag=$(git describe  --abbrev=0)
-while [ $(echo $latest_tag | grep -c xfce-4) > 0 ]
-do
-	latest_tag=$(git describe  --abbrev=0 $latest_tag^)
-	if [ $(echo $latest_tag | grep -c xfce-4) = 0 ]; then
-		break
-	fi
-done
-
-latest_major=$(echo $latest_tag | sed 's/\(.*\)-\(.*\)\.\(.*\)\.\(.*\)/\2/')
-latest_minor=$(echo $latest_tag | sed 's/\(.*\)-\(.*\)\.\(.*\)\.\(.*\)/\3/')
-latest_patch=$(echo $latest_tag | sed 's/\(.*\)-\(.*\)\.\(.*\)/\3/')
-new_patch=$(echo "$(($latest_patch + 1))")
+version_scheme=1
 
 # Check if the input parameters (component version) were provided
 test_parameters () {
+	# Get the component
 	if [ -n "$1" ]; then
 		echo "Component: $component"
 	else
@@ -36,6 +23,26 @@ test_parameters () {
 		fi
 	fi
 
+	# Get the latest tag and increment the patch version by 1
+	latest_tag=$(git describe --abbrev=0 --match "$component*" 2>/dev/null)
+	if [ "$latest_tag" = "" ]; then
+		echo "Note: This repository does not follow the <component>-<version> schema."
+		latest_tag=$(git describe --abbrev=0)
+		version_scheme=0
+	fi
+
+	if [ $version_scheme = 0 ]; then
+		latest_major=$(echo $latest_tag | sed 's/\(.*\)\.\(.*\)\.\(.*\)/\1/')
+		latest_minor=$(echo $latest_tag | sed 's/\(.*\)\.\(.*\)\.\(.*\)/\2/')
+		latest_patch=$(echo $latest_tag | sed 's/\(.*\)\.\(.*\)\.\(.*\)/\3/')
+	else
+		latest_major=$(echo $latest_tag | sed 's/\(.*\)-\(.*\)\.\(.*\)\.\(.*\)/\2/')
+		latest_minor=$(echo $latest_tag | sed 's/\(.*\)-\(.*\)\.\(.*\)\.\(.*\)/\3/')
+		latest_patch=$(echo $latest_tag | sed 's/\(.*\)-\(.*\)\.\(.*\)/\3/')
+	fi
+	new_patch=$(echo "$(($latest_patch + 1))")
+
+	# Get the version
 	if [ -n "$2" ]; then
 		echo "Version: $version"
 	else
@@ -51,6 +58,8 @@ test_parameters () {
 			echo "Version: $version"
 		fi
 	fi
+
+	# Split up the actual version number so we can re-use it later
 	semantic_version=( ${version//./ } )
 	version_major="${semantic_version[0]}"
 	version_minor="${semantic_version[1]}"
@@ -96,15 +105,14 @@ run_command () {
 update_configure_ac_in () {
 	if [ -f "configure.ac.in" ]; then
 		if [ "$1" = "pre" ]; then
-			sed -i "s/\(m4_define(\[.*_version_major\].* \[\)\(.*\)\(\])\)/\1$version_major\3/g" configure.ac.in
-			sed -i "s/\(m4_define(\[.*_version_minor\].* \[\)\(.*\)\(\])\)/\1$version_minor\3/g" configure.ac.in
-			sed -i "s/\(m4_define(\[.*_version_micro\].* \[\)\(.*\)\(\])\)/\1$version_patch\3/g" configure.ac.in
+			sed -i "s/^\(m4_define(\[.*_version_major\].* \[\)\(.*\)\(\])\)/\1$version_major\3/g" configure.ac.in
+			sed -i "s/^\(m4_define(\[.*_version_minor\].* \[\)\(.*\)\(\])\)/\1$version_minor\3/g" configure.ac.in
+			sed -i "s/^\(m4_define(\[.*_version_micro\].* \[\)\(.*\)\(\])\)/\1$version_patch\3/g" configure.ac.in
 			sed -i 's/\(m4_define(\[.*_version_tag\],\[\)\(.*\)\(\])\)/\1\3/g' configure.ac.in
 		elif [ "$1" = "post" ]; then
 			sed -i 's/\(m4_define(\[.*_version_tag\],\[\)\(.*\)\(\])\)/\1git\3/g' configure.ac.in
 		fi
 		git diff configure.ac.in
-		get_on_with_it
 	else
 		echo "There is no 'configure.ac.in' file."
 	fi
