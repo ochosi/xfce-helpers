@@ -2,8 +2,12 @@
 
 LINE_LENGTH=72
 LAST_TAG=$(git describe  --abbrev=0)
-if [ $1 = "" ]; then
-    echo "Here are the changes since the tag $LAST_TAG"
-fi
 
-git log --format=%s ${LAST_TAG}..HEAD | grep -v "Update translation" | grep -v "Add new translation" | while read line; do echo " - $line" | fold -s -w $LINE_LENGTH - | sed -e "s/^[^ ]/   &/g";done
+if [ "$1" = "" ]; then
+    echo "Here are the changes since the tag $LAST_TAG"
+	git log --format=%s ${LAST_TAG}..HEAD | grep -v "Update translation" | grep -v "Add new translation" | while read line; do echo " - $line" | fold -s -w $LINE_LENGTH - | sed -e "s/^[^ ]/   &/g";done
+
+else
+	echo "Here are the changes since the tag $1"
+	git log --format=%s $1..HEAD | grep -v "Update translation" | grep -v "Add new translation" | while read line; do echo " - $line" | fold -s -w $LINE_LENGTH - | sed -e "s/^[^ ]/   &/g";done
+fi
