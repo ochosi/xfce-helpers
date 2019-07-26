@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 
+SILENT=$2
 LINE_LENGTH=72
-LAST_TAG=$(git describe  --abbrev=0)
-if [ $1 = "" ]; then
-    echo "Here are the changes since the tag $LAST_TAG"
+LAST_TAG=$(git describe --abbrev=0)
+
+if [ -n "$1" ]; then
+    LAST_TAG=$1
+else
+    if [ "$SILENT" != "silent" ]; then
+        echo "Changes since $LAST_TAG:"
+    fi
 fi
 
 git log --format=%s ${LAST_TAG}..HEAD | grep -v "Update translation" | grep -v "Add new translation" | while read line; do echo " - $line" | fold -s -w $LINE_LENGTH - | sed -e "s/^[^ ]/   &/g";done

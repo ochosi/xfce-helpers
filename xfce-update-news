@@ -7,8 +7,8 @@ RELEASE_NOTES="/tmp/release_notes"
 TRANSLATIONS="/tmp/translations"
 
 # Push the release notes and translations text to tmp files
-xfce-get-release-notes news > $RELEASE_NOTES
-xfce-get-translations "$COMPONENT-$VERSION" $LAST_TAG silent > $TRANSLATIONS
+xfce-get-release-notes $LAST_TAG silent > $RELEASE_NOTES
+xfce-get-translations "$LAST_TAG" "HEAD^" silent > $TRANSLATIONS
 
 cleanup () {
     rm $RELEASE_NOTES
