@@ -3,67 +3,7 @@
 # Just a small script to get all language updates to a repository since a
 # commit or tag.
 
-LANGUAGE_CODES="
-ar,Arabic
-ast,Asturian
-be,Belarusian
-bg,Bulgarian
-bn,Bengali
-ca,Catalan
-cs,Czech
-da,Danish
-de,German
-el,Greek
-en_AU,English (Australia)
-en_GB,English (Great Britain)
-es,Spanish
-et,Estonian
-eu,Basque
-fi,Finnish
-fr,French
-gl,Galician
-he,Hebrew
-hr,Croatian
-hu,Hungarian
-id,Indonesian
-is,Icelandic
-it,Italian
-ja,Japanese
-kk,Kazakh
-ko,Korean
-lt,Lithuanian
-lv,Latvian
-ms,Malay
-nb,Norwegian Bokmål
-nl,Dutch (Flemish)
-nn,Norwegian Nynorsk
-oc,Occitan
-pa,Panjabi
-pl,Polish
-pt,Portuguese
-pt_BR,Portuguese (Brazilian)
-ro,Romanian
-ru,Russian
-sk,Slovak
-sl,Slovenian
-sq,Albanian
-sr,Serbian
-sv,Swedish
-te,Telugu
-th,Thai
-tr,Turkish
-ug,Uyghur
-uk,Ukrainian
-ur,Urdu
-ur_PK,Urdu (Pakistan)
-vi,Vietnamese
-zh_CN,Chinese (China)
-zh_HK,Chinese (Hong Kong)
-zh_TW,Chinese (Taiwan)
-"
-
-LAST_TAG=$(git describe  --abbrev=0)
-
+LAST_TAG=$(git describe --abbrev=0)
 STARTTAG="${1:-$LAST_TAG}"
 ENDTAG="${2:-HEAD^}"
 SILENT="${3:-}"
@@ -84,14 +24,14 @@ printf '%s\n' ' - Translation Updates:'
 
 LANGUAGES=$(
 for l in $UPDATES; do
-    echo "$LANGUAGE_CODES" | grep "^$l," | cut -d ',' -f 2
+	echo "$(grep '^"Language-Team:' po/$l.po | grep -Po '(?<=: ).*' | grep -Po '^(.*)(?= \(http)')"
 done
 )
 
 SORTED=$(echo "$LANGUAGES" | sort)
 while read line; do
-    echo -n "$line, "
-done <<< "$SORTED" | fold -s -w $LINE_LENGTH - |sed -e "s/^[^ ]/${INDENT}&/g"
+	echo -n "$line, "
+done <<< "$SORTED" | fold -s -w $LINE_LENGTH - | sed -e "s/^[^ ]/${INDENT}&/g"
 echo ""
 
 if [ "$SILENT" != "silent" ]; then
