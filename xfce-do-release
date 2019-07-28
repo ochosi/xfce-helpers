@@ -108,9 +108,9 @@ update_configure_ac_in () {
 			sed -i "s/^\(m4_define(\[.*_version_major\].* \[\)\(.*\)\(\])\)/\1$version_major\3/g" configure.ac.in
 			sed -i "s/^\(m4_define(\[.*_version_minor\].* \[\)\(.*\)\(\])\)/\1$version_minor\3/g" configure.ac.in
 			sed -i "s/^\(m4_define(\[.*_version_micro\].* \[\)\(.*\)\(\])\)/\1$version_patch\3/g" configure.ac.in
-			sed -i 's/\(m4_define(\[.*_version_tag\],\[\)\(.*\)\(\])\)/\1\3/g' configure.ac.in
+			sed -i 's/^\(m4_define(\[.*_version_tag\], \[\)\(git\)\(\])\)/\1\3/g' configure.ac.in
 		elif [ "$1" = "post" ]; then
-			sed -i 's/\(m4_define(\[.*_version_tag\],\[\)\(.*\)\(\])\)/\1git\3/g' configure.ac.in
+			sed -i 's/\(m4_define(\[.*_version_tag\], \[\)\(.*\)\(\])\)/\1git\3/g' configure.ac.in
 		fi
 		git diff configure.ac.in
 	else
