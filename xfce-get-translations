@@ -13,7 +13,7 @@ INDENT="  "
 
 UPDATES=$(git log --pretty=format:'%s' "$STARTTAG".."$ENDTAG" -- po/*.po | awk '{print $4}' | sort -u)
 
-if [ "${ENDTAG}" == "HEAD^" ]; then
+if [ "${ENDTAG}" == "HEAD" ]; then
 	ENDTAG_PRETTY="now"
 else
 	ENDTAG_PRETTY=${ENDTAG}
