@@ -15,6 +15,7 @@ fi
 git log --format=%s ${LAST_TAG}..HEAD | \
   grep -v "Update translation" | \
   grep -v "Add new translation" | \
+  grep -v "Back to development" | \
   while read line; do \
     echo " - $line" | \
     fold -s -w $LINE_LENGTH - | \
