@@ -132,6 +132,9 @@ get_sha1_hash () {
 
 # Playbook for all release steps
 run_steps () {
+	step "Update working copy to avoid conflicts \e[0m(git pull)"
+	run_command "git pull"
+
 	step "Update configure.ac.in \e[0m(add new version and remove git tag)"
 	run_command "update_configure_ac_in pre"
 
