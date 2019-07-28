@@ -9,7 +9,7 @@ ENDTAG="${2:-HEAD^}"
 SILENT="${3:-}"
 
 LINE_LENGTH=72
-INDENT="   "
+INDENT="  "
 
 UPDATES=$(git log --pretty=format:'%s' "$STARTTAG".."$ENDTAG" -- po/*.po | awk '{print $4}' | sort -u)
 
@@ -20,7 +20,7 @@ else
 fi
 NUM_LANGS=$(echo ${UPDATES}|wc -w)
 
-printf '%s\n' ' - Translation Updates:'
+printf '%s\n' '- Translation Updates:'
 
 LANGUAGES=$(
 for l in $UPDATES; do
