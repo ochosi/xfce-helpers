@@ -17,7 +17,7 @@ git log --format=%s ${LAST_TAG}..HEAD | \
   grep -v "Add new translation" | \
   grep -v "Back to development" | \
   while read line; do \
-    echo " - $line" | \
+    echo "- $line" | \
     fold -s -w $LINE_LENGTH - | \
     sed -e "s/^[^ ]/   &/g"
   done
