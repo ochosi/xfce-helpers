@@ -1,0 +1,47 @@
+#!/bin/bash
+
+user=$(whoami)
+repo=${PWD##*/}
+current_branch=$(git rev-parse --abbrev-ref HEAD)
+otheruser=$2
+
+delete () {
+    echo "Unlocking $repo for user $user"
+    ssh git@git.xfce.org D unlock users/$user/$repo
+    echo "Deleting the repository $repo"
+    ssh git@git.xfce.org D rm users/$user/$repo
+}
+
+create () {
+    echo "Adding remote 'private' to repo $repo for user $user"
+    git remote add private ssh://git@git.xfce.org/users/$user/$repo
+    git remote -v
+}
+
+fastforward () {
+    echo "Fast-fowarding branch $current_branch in repo $repo"
+    git push private :$current_branch ; git push private $current_branch
+}
+
+grantaccess () {
+    echo "Granting write access to user $otheruser on repo $repo"
+    ssh git@git.xfce.org perms users/$user/$repo + WRITERS $otheruser
+}
+
+# main loop
+if [ -n "$1" ]; then
+    if [ "$1" == "delete" ]; then
+        delete
+    elif [ "$1" == "create" ]; then
+        create
+    elif [ "$1" == "ff" ]; then
+        fastforward
+    elif [ "$1" == "grantaccess" ]; then
+        grantaccess
+    else
+        echo "Error. Invalid argument."
+        echo "Please use either 'create', 'delete', 'ff' (fast-forward) or 'grantaccess' as arguments."
+    fi
+else
+    echo "Error. This script expects an argument ('create', 'delete', 'ff' (fast-forward) or 'grantaccess')."
+fi
