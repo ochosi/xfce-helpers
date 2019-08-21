@@ -14,14 +14,19 @@ sanity_checks () {
 	fi
 	current_branch=$(git rev-parse --abbrev-ref HEAD)
 	if [ "$current_branch" != "master" ]; then
-		read -n 1 -s -p $'\e[1mWarning:\e[0m You are not on the master branch.\n'
+		if [[ "$current_branch" == *"xfce-4"* ]]; then
+			echo "You are on a maintenance branch."
+		else
+			printf "\e[1mWarning:\e[0m You are not on the master branch.\n"
+			read -n 1 -s -p "Do you really want to continue?"
+		fi
 	fi
 	echo "Updating $current_branch to avoid conflicts..."
 	git pull
 	if [ -n "$(git status --untracked-files=no --porcelain)" ]; then
 		printf "\e[1mWarning:\e[0m The working directory is not clean.\nYou have the following unstaged or uncommitted changes:\n"
 		git status --untracked-files=no -s
-		read -n 1 -p "Do you really want to continue?"
+		read -n 1 -s -p "Do you really want to continue?"
 	fi
 }
 
