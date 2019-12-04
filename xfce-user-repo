@@ -3,7 +3,6 @@
 user=$(whoami)
 repo=${PWD##*/}
 current_branch=$(git rev-parse --abbrev-ref HEAD)
-otheruser=$2
 
 delete () {
     echo "Unlocking $repo for user $user"
@@ -23,9 +22,33 @@ fastforward () {
     git push private :$current_branch ; git push private $current_branch
 }
 
+perms () {
+    addremove=$1
+    otheruser=$2
+    if [ -n "$addremove" ]; then
+        if [ -n "$otheruser" ]; then
+            if [ "$addremove" == "+" ]; then
+                echo "Granting write access to user $otheruser on repo $repo"
+            elif [ "$addremove" == "-" ]; then
+                echo "Removing write access from user $otheruser on repo $repo"
+            else
+                echo "Syntax error. Usage for granting permissions: 'perms +/- <username>'"
+            fi
+            ssh git@git.xfce.org perms users/$user/$repo $addremove WRITERS $otheruser
+        else
+            echo "Syntax error. Usage for granting permissions: 'perms +/- <username>'"
+        fi
+    fi
+    echo "Current permissions for users/$user/$repo:"
+    ssh git@git.xfce.org perms users/$user/$repo -l
+}
+
 grantaccess () {
-    echo "Granting write access to user $otheruser on repo $repo"
-    ssh git@git.xfce.org perms users/$user/$repo + WRITERS $otheruser
+    if [ -n "$1" ]; then
+        perms "+" $1
+    else
+        echo "Syntax error. Expected a valid username as argument. (Usage: 'grantaccess <username>')"
+    fi
 }
 
 # main loop
@@ -37,11 +60,13 @@ if [ -n "$1" ]; then
     elif [ "$1" == "ff" ]; then
         fastforward
     elif [ "$1" == "grantaccess" ]; then
-        grantaccess
+        grantaccess $2
+    elif [ "$1" == "perms" ]; then
+        perms $2 $3
     else
         echo "Error. Invalid argument."
-        echo "Please use either 'create', 'delete', 'ff' (fast-forward) or 'grantaccess' as arguments."
+        echo "Please use either 'create', 'delete', 'ff' (fast-forward), 'grantaccess' or 'perms' as arguments."
     fi
 else
-    echo "Error. This script expects an argument ('create', 'delete', 'ff' (fast-forward) or 'grantaccess')."
+    echo "Error. This script expects an argument ('create', 'delete', 'ff' (fast-forward), 'grantaccess' or 'perms')."
 fi
