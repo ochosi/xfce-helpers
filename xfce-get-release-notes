@@ -19,5 +19,5 @@ git log --format=%s ${LAST_TAG}..HEAD | \
   while read line; do \
     echo "- $line" | \
     fold -s -w $LINE_LENGTH - | \
-    sed -e "s/^[^ ]/   &/g"
+    sed -e "s/^[^ ]/&/g"
   done
