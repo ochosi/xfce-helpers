@@ -31,7 +31,7 @@ done
 SORTED=$(echo "$LANGUAGES" | sort)
 while read line; do
 	echo -n "$line, "
-done <<< "$SORTED" | fold -s -w $LINE_LENGTH - | sed -e "s/^[^ ]/${INDENT}&/g"
+done <<< "$SORTED" | fold -s -w $LINE_LENGTH - | sed -e "s/^[^ ]/${INDENT}&/g" | sed -e 's/[[:space:]]*$//'
 echo ""
 
 if [ "$SILENT" != "silent" ]; then
