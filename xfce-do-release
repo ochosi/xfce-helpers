@@ -129,8 +129,7 @@ run_command () {
 edit () {
 	read -n 1 -p " → Accept? ([y]es, [e]dit" response
 	if [ "$response" = "y" ]; then
-		eval $1 && eval $2 && eval $3
-		printf "\n ✓ Accepted."
+		printf "\n ✓ Accepted.\n"
 	elif [ "$response" = "e" ]; then
 		$(git config --global core.editor) $1
 	fi
