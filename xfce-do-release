@@ -126,6 +126,16 @@ run_command () {
 	fi
 }
 
+edit () {
+	read -n 1 -p " → Accept? ([y]es, [e]dit" response
+	if [ "$response" = "y" ]; then
+		eval $1 && eval $2 && eval $3
+		printf "\n ✓ Accepted."
+	elif [ "$response" = "e" ]; then
+		$(git config --global core.editor) $1
+	fi
+}
+
 update_configure_ac_in () {
 	if [ -f "configure.ac.in" ]; then
 		if [ "$1" = "pre" ]; then
@@ -153,6 +163,7 @@ run_steps () {
 
 	step "Update NEWS file with changelog? \e[0m(xfce-update-news)"
 	run_command "xfce-update-news $component $version"
+	edit NEWS
 
 	step "Build the tarball \e[0m(./autogen.sh && make distcheck)"
 	run_command "./autogen.sh" "make distcheck"
