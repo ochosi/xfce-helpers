@@ -20,6 +20,10 @@ else
 fi
 NUM_LANGS=$(echo ${UPDATES}|wc -w)
 
+if [ "$NUM_LANGS" = "0" ]; then
+	exit 0
+fi
+
 printf '%s\n' '- Translation Updates:'
 
 LANGUAGES=$(
