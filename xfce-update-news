@@ -2,6 +2,7 @@
 
 COMPONENT=$1
 VERSION=$2
+WRITE_TAG=$3
 LAST_TAG=$(git describe  --abbrev=0)
 RELEASE_NOTES="/tmp/release_notes"
 TRANSLATIONS="/tmp/translations"
@@ -16,7 +17,9 @@ cleanup () {
 }
 
 # Check if there is a NEWS file
-if [ ! -f "NEWS" ]; then
+if [ "$WRITE_TAG" = "WRITETAG" ]; then
+    printf '%s\n\n%s\n%s\n' $VERSION "$(cat $RELEASE_NOTES)" "$(cat $TRANSLATIONS)"
+elif [ ! -f "NEWS" ]; then
     echo "There is no 'NEWS' file. Changelog since $VERSION:"
     printf '%s\n======\n%s\n%s\n\n%s' $VERSION "$(cat $RELEASE_NOTES)" "$(cat $TRANSLATIONS)"
     cleanup

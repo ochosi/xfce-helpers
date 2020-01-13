@@ -172,7 +172,7 @@ run_steps () {
 	run_command "git add -u" "git commit -m 'Updates for release'"
 
 	step "Tag the version \e[0m(git tag -a $component-$version)"
-	run_command "git tag -a $component-$version"
+	run_command 'git tag -a $component-$version -e -m "$(xfce-update-news $component $version WRITETAG)"'
 
 	step "Push your changes \e[0m(git push && git push --tags)"
 	run_command "git push" "git push --tags"

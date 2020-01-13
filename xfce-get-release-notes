@@ -13,6 +13,7 @@ else
 fi
 
 git log --format=%s ${LAST_TAG}..HEAD | \
+  grep -v "Updates for release" | \
   grep -v "Update translation" | \
   grep -v "Add new translation" | \
   grep -v "Back to development" | \
