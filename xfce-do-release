@@ -32,7 +32,7 @@ sanity_checks () {
 		echo "INFO: please install xfce-test to support building in a clean environment. See https://github.com/schuellerf/xfce-test"
 	else
 		images=$(docker images|grep -Po "(?<=^schuellerf/xfce-test) +[^ ]+"|tr -d ' ')
-		echo "Select docker version to work with:"
+		echo "Select xfce-test docker-tag to work with:"
 		select image in $images; do
 			break
 		done
