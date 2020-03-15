@@ -28,6 +28,23 @@ sanity_checks () {
 		git status --untracked-files=no -s
 		read -n 1 -s -p "Do you really want to continue?"
 	fi
+	if ! which xfce-test >/dev/null; then
+		echo "INFO: please install xfce-test to support building in a clean environment. See https://github.com/schuellerf/xfce-test"
+	else
+		images=$(docker images|grep -Po "(?<=^schuellerf/xfce-test) +[^ ]+"|tr -d ' ')
+		echo "Select docker version to work with:"
+		select image in $images; do
+			break
+		done
+
+		if [ -z "$image" ]; then
+			echo "No xfce-test images found or selected. Use 'xfce-test pull' to get one."
+		else
+			export TAG=$image
+			echo "Working with $image"
+		fi
+
+	fi
 }
 
 # Check if the input parameters (component version) were provided
@@ -165,7 +182,12 @@ run_steps () {
 	edit NEWS
 
 	step "Build the tarball \e[0m(./autogen.sh && make distcheck)"
-	run_command "./autogen.sh" "make distcheck"
+	# either in xfce-test container or on the local machine
+	if [ -n "$TAG" ]; then
+		run_command "xfce-test call ./autogen.sh" "xfce-test call make distcheck"
+	else
+		run_command "./autogen.sh" "make distcheck"
+	fi
 
 	step "Commit the changes \e[0m(git add -u; git commit -m 'Updates for release')"
 	run_command "git add -u" "git commit -m 'Updates for release'"
