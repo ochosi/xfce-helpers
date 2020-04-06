@@ -2,7 +2,7 @@
 
 component=$1
 version=$2
-steps=1
+steps=0
 steps_complete=0
 version_scheme=1
 
