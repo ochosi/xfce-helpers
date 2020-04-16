@@ -9,9 +9,10 @@ migrate_to_gl () {
 
       if git ls-files >& /dev/null; then
           if git remote -v | grep git.xfce.org >& /dev/null; then
-              echo updating $d
+              echo "* Updating git remotes in $d"
               sed -i 's|git.xfce.org|gitlab.xfce.org|g' .git/config
               sed -i 's|git://|https://|g' .git/config
+              echo "  ✓ Done"
           fi
       fi
 
@@ -22,9 +23,9 @@ migrate_to_gl () {
 read -n 1 -p "Do you want to migrate all Git repositories in the current folder from git.xfce.org to gitlab.xfce.org? ([y]es, [n]o)" response
 printf "\n"
 if [ "$response" = "y" ]; then
-  migrate_to_gl
-  printf "\n ✓ Done.\n"
+    migrate_to_gl
+    printf "\nFinished.\n"
 else
-  printf "Aborted.\n"
-  exit 0;
+    printf "Aborted.\n"
+    exit 0;
 fi
