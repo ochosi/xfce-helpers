@@ -23,8 +23,8 @@ read -n 1 -p "Do you want to migrate all Git repositories in the current folder 
 printf "\n"
 if [ "$response" = "y" ]; then
   migrate_to_gl
-  printf "\n ✓ Done."
+  printf "\n ✓ Done.\n"
 else
-  printf "Aborted."
+  printf "Aborted.\n"
   exit 0;
 fi
