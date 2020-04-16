@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Simple script to migrate the remotes of all git repositories below the current
+# directory from git.xfce.org to gitlab.xfce.org
+
+migrate_to_gl () {
+  for d in */; do
+      cd $d
+
+      if git ls-files >& /dev/null; then
+          if git remote -v | grep git.xfce.org >& /dev/null; then
+              echo updating $d
+              sed -i 's|git.xfce.org|gitlab.xfce.org|g' .git/config
+              sed -i 's|git://|https://|g' .git/config
+          fi
+      fi
+
+      cd ..
+  done
+}
+
+read -n 1 -p "Do you want to migrate all Git repositories in the current folder from git.xfce.org to gitlab.xfce.org? ([y]es, [n]o)" response
+printf "\n"
+if [ "$response" = "y" ]; then
+  migrate_to_gl
+  printf "\n ✓ Done."
+else
+  printf "Aborted."
+  exit 0;
+fi
