@@ -5,6 +5,11 @@
 
 migrate_to_gl () {
   for d in */; do
+      if [[ $d = *" "* ]]; then
+          echo "Skipping directory $d because it contains spaces."
+          continue
+      fi
+
       cd $d
 
       if git ls-files >& /dev/null; then
