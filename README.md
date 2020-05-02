@@ -10,6 +10,3 @@ You can specify the start tag/commit and end tag/commit between which you want t
 
 ## xfce-get-release-notes
 This script is complementary to xfce-translations and gets all the commits that aren't translation updates.
-
-## xfce-remove-user-repo
-This script removes a user repository from git.xfce.org. By default it presumes the current directory is local clone of the repository you wish to remove.
