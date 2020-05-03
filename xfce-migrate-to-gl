@@ -10,8 +10,10 @@ migrate_to_gl () {
       if git ls-files >& /dev/null; then
           if git remote -v | grep git.xfce.org >& /dev/null; then
               echo "* Updating git remotes in $d"
-              sed -i 's|git.xfce.org|gitlab.xfce.org|g' .git/config
-              sed -i 's|git://|https://|g' .git/config
+              sed -Ei '
+                  s|git://|https://|
+                  s|git\.xfce\.org(.*[^/])/?|gitlab.xfce.org\1.git|
+              ' .git/config
               echo "  ✓ Done"
           fi
       fi
