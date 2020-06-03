@@ -163,8 +163,14 @@ update_configure_ac_in () {
 			sed -i 's/\(m4_define(\[.*_version_tag\], \[\)\(.*\)\(\])\)/\1git\3/g' configure.ac.in
 		fi
 		git diff configure.ac.in
+	elif [ -f "configure.ac" ]; then
+		if [ "$1" = "pre" ]; then
+			sed -i "s/^\(XDT_VERSION_INIT\s*\)(.*/\1([$version])/" configure.ac
+		elif [ "$1" = "post" ]; then
+			sed -i "s/^\(XDT_VERSION_INIT\s*\)(.*/\1([$version], [git])/" configure.ac
+		fi
 	else
-		echo "There is no 'configure.ac.in' file."
+		echo "There is no 'configure.ac.in' or 'configure.ac' file."
 	fi
 }
 
