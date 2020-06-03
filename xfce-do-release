@@ -209,9 +209,6 @@ run_steps () {
 
 	step "Commit and push the change \e[0m(git add -u; git commit -m 'Back to development'; git push)"
 	run_command "git add -u" "git commit -m 'Back to development'" "git push"
-
-	step "Add the version to the bugzilla component \e[0m(https://bugzilla.xfce.org/editversions.cgi?action=add&product=$component)"
-	run_command "exo-open 'https://bugzilla.xfce.org/editversions.cgi?action=add&product=$component'"
 }
 
 ### Main loop
